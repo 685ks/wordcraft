@@ -8,7 +8,7 @@ version = "0.9.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
-repository = "https://github.com/storytold/wordcraft"
+repository = "https://github.com/685ks/wordcraft"
 
 [workspace.dependencies]
 # internal
@@ -71,6 +71,11 @@ hmac = "0.13"
 base64 = "0.22"
 getrandom = "0.3"
 zeroize = "1"
+
+# The house design tokens (Arthavan Projects' craft-libs fork), behind the house theme (crates/ui-egui/src/theme.rs).
+craft-tokens = { git = "https://github.com/685ks/craft-libs", tag = "v0.1.0", version = "=0.1.0", features = ["egui"] }
+# The build-script helper that embeds the optional craft-fonts checkout (crates/fonts/build.rs).
+craft-fonts-build = { git = "https://github.com/685ks/craft-fonts", rev = "f28afbb766ccddc9cfd136b8cf0b451a24149e1b" }
 
 # ui
 egui = "0.36"

@@ -37,7 +37,7 @@ impl KeyFile {
 /// cannot be bound or there is no random key (the control channel is off); the key file is
 /// `None` when it could not be written (requests are then refused).
 pub fn start(port: u16, ctx: egui::Context, settings: Option<&Path>) -> Option<(Receiver<ControlRequest>, Option<KeyFile>)> {
-    let listener = match TcpListener::bind(("127.0.0.1", port)) {
+    let listener = match bind_loopback(port) {
         Ok(l) => l,
         Err(e) => {
             log::error!("control server failed to bind 127.0.0.1:{port}: {e}");
@@ -72,6 +72,12 @@ pub fn start(port: u16, ctx: egui::Context, settings: Option<&Path>) -> Option<(
         None => log::info!("control server listening on 127.0.0.1:{port}"),
     }
     Some((serve_on(listener, ctx, key, FIRST_REQUEST), key_file))
+}
+
+/// Bind the control listener: always the IPv4 loopback address, never a wildcard or a LAN
+/// address, so the control channel can't be reached from another machine.
+fn bind_loopback(port: u16) -> std::io::Result<TcpListener> {
+    TcpListener::bind((std::net::Ipv4Addr::LOCALHOST, port))
 }
 
 /// A new key: 32 random bytes from the operating system, as hex.
@@ -310,6 +316,61 @@ mod tests {
         assert_eq!((r["ok"].clone(), r["error"].clone(), r["id"].clone()), (json!(false), json!("unauthorized"), json!(1)));
         assert!(c.closed());
         assert!(rx.try_recv().is_err(), "nothing reached the UI");
+    }
+
+    /// Every method the UI dispatcher answers, read from its `match` arms in
+    /// `crates/ui-egui/src/control.rs`, so a new route is covered by the key tests below.
+    fn every_route() -> Vec<String> {
+        let source = include_str!("../../../crates/ui-egui/src/control.rs");
+        let mut routes = std::collections::BTreeSet::new();
+        for line in source.lines() {
+            let Some(arm) = line.strip_prefix("        \"") else { continue };
+            let Some((patterns, _)) = arm.split_once(" =>") else { continue };
+            let patterns = patterns.split(" if ").next().unwrap_or("");
+            for pattern in format!("\"{patterns}").split('|') {
+                let name = pattern.trim().trim_matches('"');
+                if name.contains('.') && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '.') {
+                    routes.insert(name.to_string());
+                }
+            }
+        }
+        routes.into_iter().collect()
+    }
+
+    #[test]
+    fn the_route_list_covers_the_documented_methods() {
+        let routes = every_route();
+        for documented in ["engine.execute", "document.inspect", "ui.inspect", "ui.screenshot", "ui.click", "ui.key", "app.quit"] {
+            assert!(routes.iter().any(|r| r == documented), "{documented} not found in {routes:?}");
+        }
+    }
+
+    /// One connection per route and per wrong key (none, a near miss, an empty one): the server
+    /// answers "unauthorized", closes the connection, and nothing reaches the UI.
+    #[test]
+    fn every_route_requires_the_key() {
+        let (port, rx) = boot();
+        let near = format!("{}0", &KEY[..63]);
+        for route in every_route() {
+            for key in [None, Some(near.as_str()), Some("")] {
+                let mut c = Conn::open(port);
+                let frame = match key {
+                    Some(k) => json!({"id": 1, "key": k, "method": route, "params": {"key": KEY}}),
+                    None => json!({"id": 1, "method": route, "params": {}}),
+                };
+                let r = c.call(&frame.to_string());
+                assert_eq!((r["ok"].clone(), r["error"].clone()), (json!(false), json!("unauthorized")), "{route} {key:?}");
+                assert!(c.closed(), "{route} {key:?}: the connection stays open");
+            }
+        }
+        assert!(rx.try_recv().is_err(), "a route was dispatched without the key");
+    }
+
+    #[test]
+    fn the_listener_is_bound_to_loopback_only() {
+        let listener = bind_loopback(0).unwrap();
+        let local = listener.local_addr().unwrap();
+        assert_eq!(local.ip(), std::net::IpAddr::V4(std::net::Ipv4Addr::LOCALHOST), "{local}");
     }
 
     #[test]

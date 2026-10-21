@@ -17,7 +17,7 @@
 
 	(no suggestions)	(brak propozycji)
 	1.5 Line Spacing	Interlinia 1,5
-	A free, open-source word processor written from scratch in Rust.\nPart of the Crafting Apps from the ArtCraft team.	Darmowy edytor tekstu o otwartym kodzie, napisany od podstaw w języku Rust.\nCzęść rodziny Crafting Apps zespołu ArtCraft.
+	A free, open-source word processor written from scratch in Rust.	Darmowy edytor tekstu o otwartym kodzie, napisany od podstaw w języku Rust.
 	About	Informacje
 	About WordCraft	O programie WordCraft
 	Accept	Zaakceptuj
@@ -84,6 +84,7 @@
 	Bookmark	Zakładka
 	Bookmark name:	Nazwa zakładki:
 	Delete Bookmark	Usuń zakładkę
+	GitHub	GitHub
 	Hidden bookmarks	Ukryte zakładki
 	Sort by:	Sortuj według:
 	Border Painter	Pędzel krawędzi
@@ -149,7 +150,6 @@
 	Comment	Komentarz
 	Comments	Komentarze
 	Comments Pane	Okienko komentarzy
-	Community\nDiscord	Społeczność\nDiscord
 	Compact	Zwarte
 	Compare	Porównaj
 	Compress Pictures	Kompresuj obrazy
@@ -201,8 +201,6 @@
 	Different First Page	Inna pierwsza strona
 	Different Odd & Even Pages	Inne strony parzyste i nieparzyste
 	Direct formatting	Formatowanie bezpośrednie
-	Discord	Discord
-	Discord community	Społeczność na Discordzie
 	Display	Wyświetlanie
 	Display for Review	Wyświetlanie do recenzji
 	Distribute Columns	Rozłóż kolumny
@@ -364,8 +362,6 @@
 	Inspect Styles at Selection	Przejrzyj style zaznaczenia
 	Interface language:	Język interfejsu:
 	Italic	Kursywa
-	Join the ArtCraft community on Discord	Dołącz do społeczności ArtCraft na Discordzie
-	Join us on Discord: discord.gg/artcraft	Dołącz do nas na Discordzie: discord.gg/artcraft
 	Justify	Wyjustuj
 	Keep Lines Together	Zachowaj wiersze razem
 	Keep Text Only	Zachowaj tylko tekst
@@ -677,7 +673,6 @@
 	Show Notes	Pokaż przypisy
 	Show all formatting marks	Pokaż wszystkie znaki formatowania
 	Show rulers	Pokaż linijki
-	Show the community button in the title bar	Pokaż przycisk społeczności na pasku tytułu
 	Show/Hide ¶	Pokaż/ukryj ¶
 	Show\nComments	Pokaż\nkomentarze
 	Shrink Font 1 Point	Pomniejsz czcionkę o 1 punkt
@@ -692,7 +687,7 @@
 	Small caps	Kapitaliki
 	SmartArt	SmartArt
 	Sort	Sortuj
-	Source code: github.com/storytold/wordcraft	Kod źródłowy: github.com/storytold/wordcraft
+	Source code: github.com/685ks/wordcraft	Kod źródłowy: github.com/685ks/wordcraft
 	Space before/after:	Odstęp przed/po:
 	Spacing	Odstępy
 	Spacing (pt):	Odstępy (pt):
@@ -1057,7 +1052,6 @@
 	Insert a new equation (Alt+=)	Wstaw nowe równanie (Alt+=)
 	Leave the equation (Esc)	Opuść równanie (Esc)
 	Preview	Podgląd
-	getartcraft.com/apps/wordcraft	getartcraft.com/apps/wordcraft
 	English (United Kingdom)	Angielski (Wielka Brytania)
 	Polish	Polski
 	Do Not Check Spelling or Grammar	Nie sprawdzaj pisowni ani gramatyki

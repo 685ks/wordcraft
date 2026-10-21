@@ -794,12 +794,19 @@ mod tests {
             assert!(img.pixels.iter().any(|p| p.a() == 0), "{key}: transparent paper");
             for t in [Tokens::light(), Tokens::dark()] {
                 let (bg, fg) = (t.input, t.text);
-                let (lo, hi) = (bg.r().min(fg.r()), bg.r().max(fg.r()));
+                let (bg, fg) = ([bg.r(), bg.g(), bg.b()], [fg.r(), fg.g(), fg.b()]);
+                // The light theme is pure greys; the house (dark) theme's greys carry its blue
+                // tint, so there each channel stays between the tile's and the text's.
+                let greys = bg[0] == bg[1] && bg[1] == bg[2] && fg[0] == fg[1] && fg[1] == fg[2];
                 for p in &img.pixels {
                     let a = p.a();
-                    let c = [mix(fg.r(), bg.r(), a), mix(fg.g(), bg.g(), a), mix(fg.b(), bg.b(), a)];
-                    assert!(c[0] == c[1] && c[1] == c[2], "{key}: a grey, not {c:?}");
-                    assert!((lo..=hi).contains(&c[0]), "{key}: between the tile and the text colour, not {c:?}");
+                    let c = [mix(fg[0], bg[0], a), mix(fg[1], bg[1], a), mix(fg[2], bg[2], a)];
+                    if greys {
+                        assert!(c[0] == c[1] && c[1] == c[2], "{key}: a grey, not {c:?}");
+                    }
+                    for ((ch, b), f) in c.iter().zip(bg).zip(fg) {
+                        assert!((b.min(f)..=b.max(f)).contains(ch), "{key}: between the tile and the text colour, not {c:?}");
+                    }
                 }
             }
         }

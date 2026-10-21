@@ -14,7 +14,7 @@
 	(no style)	(keine Formatvorlage)
 	(no suggestions)	(keine Vorschläge)
 	1.5 Line Spacing	Zeilenabstand 1,5
-	A free, open-source word processor written from scratch in Rust.\nPart of the Crafting Apps from the ArtCraft team.	Ein kostenloses, quelloffenes Textverarbeitungsprogramm, von Grund auf in Rust geschrieben.\nTeil der Crafting Apps des ArtCraft-Teams.
+	A free, open-source word processor written from scratch in Rust.	Ein kostenloses, quelloffenes Textverarbeitungsprogramm, von Grund auf in Rust geschrieben.
 	About	Info
 	About WordCraft	Über WordCraft
 	Accept	Annehmen
@@ -92,6 +92,7 @@
 	Enter formatting for number:	Formatierung für die Nummer eingeben:
 	Follow number with:	Der Nummer folgt:
 	Formatting	Formatierung
+	GitHub	GitHub
 	In the margin	Am Rand
 	Include level number from:	Ebenennummer übernehmen aus:
 	Ink	Freihand
@@ -234,7 +235,6 @@
 	Comment	Kommentar
 	Comments	Kommentare
 	Comments Pane	Kommentarbereich
-	Community\nDiscord	Community-\nDiscord
 	Compact	Kompakt
 	Compare	Vergleichen
 	Compress Pictures	Bilder komprimieren
@@ -287,8 +287,6 @@
 	Dictate	Diktieren
 	Different First Page	Andere erste Seite
 	Different Odd & Even Pages	Andere gerade und ungerade Seiten
-	Discord	Discord
-	Discord community	Discord-Community
 	Display	Anzeige
 	Display for Review	Anzeige zur Überprüfung
 	Distribute Columns	Spalten verteilen
@@ -446,8 +444,6 @@
 	Inspect Document	Dokument prüfen
 	Interface language:	Benutzeroberflächensprache:
 	Italic	Kursiv
-	Join the ArtCraft community on Discord	Treten Sie der ArtCraft-Community auf Discord bei
-	Join us on Discord: discord.gg/artcraft	Besuchen Sie uns auf Discord: discord.gg/artcraft
 	Justify	Blocksatz
 	Keep Lines Together	Zeilen nicht trennen
 	Keep lines together	Zeilen nicht trennen
@@ -744,7 +740,6 @@
 	Show only comments and formatting in balloons	Nur Kommentare und Formatierung in Sprechblasen anzeigen
 	Show revisions in balloons	Änderungen in Sprechblasen anzeigen
 	Show rulers	Lineale einblenden
-	Show the community button in the title bar	Die Community-Schaltfläche in der Titelleiste anzeigen
 	Show/Hide ¶	¶ ein-/ausblenden
 	Show\nComments	Kommentare\neinblenden
 	Shrink Font 1 Point	Schrift um 1 Punkt verkleinern
@@ -759,7 +754,7 @@
 	Small caps	Kapitälchen
 	SmartArt	SmartArt
 	Sort	Sortieren
-	Source code: github.com/storytold/wordcraft	Quellcode: github.com/storytold/wordcraft
+	Source code: github.com/685ks/wordcraft	Quellcode: github.com/685ks/wordcraft
 	Space	Leerzeichen
 	Space before/after:	Abstand vor/nach:
 	Spacing	Abstand
@@ -1143,7 +1138,6 @@
 	Insert a new equation (Alt+=)	Eine neue Formel einfügen (Alt+=)
 	Leave the equation (Esc)	Die Formel verlassen (Esc)
 	Preview	Vorschau
-	getartcraft.com/apps/wordcraft	getartcraft.com/apps/wordcraft
 	Draw Ink	Freihand zeichnen
 	Erase Ink	Freihand radieren
 	Hide Ink	Freihand ausblenden
