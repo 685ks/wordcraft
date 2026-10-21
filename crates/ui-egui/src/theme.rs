@@ -402,7 +402,8 @@ impl Tokens {
             group_label: c::TEXT_FAINT.into(),
             // The text area is lighter than the margins, as in the light theme (#1148).
             ruler: white(0.09),
-            ruler_margin: c::BG_BASE.into(),
+            // Not the canvas colour: the margins must read as part of the ruler bar.
+            ruler_margin: white(0.03),
             ruler_tick: c::TEXT_MUTED.into(),
             status_bar: c::BG_SHEET.into(),
             selection: c::ACCENT_BASE.with_alpha(0.35).into(),
