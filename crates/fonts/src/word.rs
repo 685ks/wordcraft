@@ -495,9 +495,13 @@ mod tests {
 
     #[test]
     fn synthesizes_missing_styles() {
-        // JetBrains Mono ships only Regular here.
+        // The bundled JetBrains Mono is Regular only; craft-fonts' variable one (with
+        // `CRAFT_FONTS_DIR`) adds weights, and an installed family may add italics. Whatever face
+        // bold italic resolves to, what it lacks is synthesized and what it has is not.
         let r = resolve("JetBrains Mono", true, true);
-        assert!(r.synth_bold && r.synth_italic);
+        let face = r.face.get();
+        assert_eq!(r.synth_bold, face.weight < 600.0, "{} {}", face.family, face.style);
+        assert_eq!(r.synth_italic, !face.italic, "{} {}", face.family, face.style);
     }
 
     #[test]

@@ -60,20 +60,21 @@ mod tests {
         WordApp::new(wordcraft_engine::Session::new(wordcraft_engine::sample::sample_document()), Services::default())
     }
 
-    /// #2132: dark mode chosen on one visit is there after a reload.
+    /// #2132: a theme chosen on one visit is there after a reload. Dark (the house theme) is the
+    /// default, so the visit picks Light.
     #[test]
-    fn dark_mode_survives_reload() {
+    fn a_chosen_theme_survives_reload() {
         let mut first = app();
         let mut sync = PrefsSync::new(None);
         let initial = sync.changed(&first);
         assert!(initial.is_some(), "first frame stores the preferences");
         assert_eq!(sync.changed(&first), None, "unchanged preferences are not rewritten");
-        first.run("ui.theme", json!({"value": "dark"})).unwrap();
+        first.run("ui.theme", json!({"value": "light"})).unwrap();
         let stored = sync.changed(&first).expect("the theme change is stored");
 
         let mut reloaded = app();
         restore(&mut reloaded, Some(&stored));
-        assert_eq!(reloaded.ui.theme, wordcraft_ui_egui::theme::Appearance::Dark);
+        assert_eq!(reloaded.ui.theme, wordcraft_ui_egui::theme::Appearance::Light);
         assert_eq!(PrefsSync::new(Some(stored)).changed(&reloaded), None, "restoring doesn't write back");
     }
 
