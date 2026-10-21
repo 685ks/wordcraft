@@ -40,6 +40,10 @@ cat ~/.config/wordcraft/control-key.local-7981   # Linux, outside Flatpak, port 
 - A connection that sends no authorised request within 30 s of being accepted is closed. That is
   one limit: blank lines and bad JSON do not extend it. After an authorised request the
   connection may stay idle.
+- The listener is bound to `127.0.0.1` only. These guarantees are tested in
+  `apps/wordcraft/src/control_server.rs`: every method the UI dispatcher answers (read from
+  `crates/ui-egui/src/control.rs`) is sent without the key, with a near-miss key and with an empty
+  one, and nothing reaches the UI; the listener's address is checked to be loopback.
 
 `wordcraft-cli mcp --connect` takes the key from `WORDCRAFT_CONTROL_KEY`, or else from the key
 file for the port it connects to, and reads it again on every new connection (the app may have

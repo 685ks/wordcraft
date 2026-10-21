@@ -1,6 +1,9 @@
 # The CLAUDE.md quality gate (`cargo xtask ci`: fmt, clippy -D warnings, tests, assets, layers,
 # wasm) on every pull request and every push to main, so a merge burst can't land a red tree that
-# only the next contributor's local run discovers.
+# only the next contributor's local run discovers; plus the core crates' tests and a build check
+# of the desktop app on macOS and Windows. (printing.yml runs the app and UI tests on all three.)
+#
+# Every third-party action is pinned by commit SHA.
 name: CI
 
 on:
@@ -17,25 +20,37 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Same craft-fonts commit as release.yml and freebsd.yml, so layout tests see the fonts a
-  # release build embeds (the checkout is an optional build input, see crates/fonts/build.rs).
-  CRAFT_FONTS_REF: 8dcdacd5153e64560d109541a47d806f26f048c0
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  # The 685ks/craft-fonts commit the layout tests embed (an optional build input, see
+  # crates/fonts/build.rs); the same commit as the craft-fonts-build pin in Cargo.toml.
+  CRAFT_FONTS_REF: f28afbb766ccddc9cfd136b8cf0b451a24149e1b
 
 jobs:
   gate:
-    name: cargo xtask ci
+    name: cargo xtask ci (ubuntu-24.04)
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
-    env:
-      CARGO_TERM_COLOR: always
-      CARGO_INCREMENTAL: "0"
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # This fork carries no ArtCraft marks or links and no storytold/craft-common-actions
+      # workflows (house rules). LICENSE and NOTICE keep the upstream copyright line.
+      - name: Rebrand guard
+        run: |
+          set -euo pipefail
+          if git grep -nI 'craft-common-actions' -- . ':!.github/workflows/ci.yml'; then
+            echo "::error::storytold/craft-common-actions is not used in this fork"; exit 1
+          fi
+          if git grep -nIi -e 'getartcraft' -e 'discord\.gg' -e 'ai\.storyteller' -e 'storyteller\.ai' -- . ':!.github/workflows/ci.yml' ':!crates/ui-egui/src/links.rs'; then
+            echo "::error::ArtCraft/storyteller links or ids remain"; exit 1
+          fi
+          if [ -d docs/brand ]; then echo "::error::docs/brand (ArtCraft marks) must not exist"; exit 1; fi
 
       - name: Check out craft-fonts
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: storytold/craft-fonts
+          repository: 685ks/craft-fonts
           ref: ${{ env.CRAFT_FONTS_REF }}
           path: craft-fonts
 
@@ -60,3 +75,36 @@ jobs:
         env:
           CRAFT_FONTS_DIR: ${{ github.workspace }}/craft-fonts
         run: cargo xtask ci
+
+  platforms:
+    name: core tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install Rust (stable)
+        shell: bash
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      # The document model, fonts, layout and file formats: the crates the rest of the app stands
+      # on, and the ones whose behaviour can differ by platform (paths, system fonts).
+      - name: Test core crates
+        shell: bash
+        run: >-
+          cargo test --locked
+          -p wordcraft-geom -p wordcraft-doc -p wordcraft-fonts -p wordcraft-layout
+          -p wordcraft-docx -p wordcraft-formats
+
+      - name: Check the desktop app builds
+        run: cargo check --locked -p wordcraft --bins

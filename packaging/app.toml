@@ -1,0 +1,13 @@
+# Packaging metadata read by the shared release workflow
+# (685ks/craft-actions/.github/workflows/release-rust-app.yml, called from
+# .github/workflows/release.yml). Asset names: wordcraft-<version>-<os>-<arch>[-portable].<ext>.
+id = "wordcraft"
+display_name = "WordCraft"
+bundle_id = "app.freedev.ainz.ks.WordCraft"
+publisher = "Arthavan Projects"
+description = "A fast, open-source word processor: styles, tables, track changes, references, mail merge and .docx files"
+categories = ["Office", "WordProcessor"]
+icon_png = "assets/app-icon/hicolor/512x512/apps/app.freedev.ainz.ks.WordCraft.png"
+icon_icns = "assets/app-icon/wordcraft.icns"
+icon_ico = "assets/app-icon/wordcraft.ico"
+license = "MIT OR Apache-2.0"

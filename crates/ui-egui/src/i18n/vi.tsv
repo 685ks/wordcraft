@@ -19,7 +19,7 @@
 	(no style)	(không có kiểu)
 	(no suggestions)	(không có gợi ý)
 	1.5 Line Spacing	Giãn dòng 1,5
-	A free, open-source word processor written from scratch in Rust.\nPart of the Crafting Apps from the ArtCraft team.	Trình xử lý văn bản miễn phí, mã nguồn mở được viết từ đầu bằng Rust.\nMột phần trong bộ ứng dụng Crafting Apps của đội ngũ ArtCraft.
+	A free, open-source word processor written from scratch in Rust.	Trình xử lý văn bản miễn phí, mã nguồn mở được viết từ đầu bằng Rust.
 	About	Giới thiệu
 	About WordCraft	Giới thiệu về WordCraft
 	Accept	Chấp nhận
@@ -87,6 +87,7 @@
 	Enter formatting for number:	Nhập định dạng cho số:
 	Follow number with:	Theo sau số bằng:
 	Formatting	Định dạng
+	GitHub	GitHub
 	Include level number from:	Bao gồm số cấp độ từ:
 	Ink	Mực
 	Insertions and Deletions	Phần chèn và phần xóa
@@ -222,7 +223,6 @@
 	Comment	Nhận xét
 	Comments	Nhận xét
 	Comments Pane	Ngăn nhận xét
-	Community\nDiscord	Cộng đồng\nDiscord
 	Compact	Thu gọn
 	Compare	So sánh
 	Compress Pictures	Nén ảnh
@@ -275,8 +275,6 @@
 	Different First Page	Trang đầu khác biệt
 	Different Odd & Even Pages	Trang chẵn & lẻ khác nhau
 	Direct formatting	Định dạng trực tiếp
-	Discord	Discord
-	Discord community	Cộng đồng Discord
 	Display	Hiển thị
 	Display for Review	Hiển thị để xem lại
 	Distribute Columns	Chia đều cột
@@ -441,8 +439,6 @@
 	Inspect Styles at Selection	Kiểm tra kiểu tại vùng chọn
 	Interface language:	Ngôn ngữ giao diện:
 	Italic	In nghiêng
-	Join the ArtCraft community on Discord	Tham gia cộng đồng ArtCraft trên Discord
-	Join us on Discord: discord.gg/artcraft	Tham gia cùng chúng tôi trên Discord: discord.gg/artcraft
 	Justify	Căn đều
 	Keep Lines Together	Giữ các dòng cùng nhau
 	Keep Text Only	Chỉ giữ văn bản
@@ -767,7 +763,6 @@
 	Show only comments and formatting in balloons	Chỉ hiện nhận xét và định dạng trong ô bên lề
 	Show revisions in balloons	Hiện các sửa đổi trong ô bên lề
 	Show rulers	Hiện thước
-	Show the community button in the title bar	Hiện nút cộng đồng trong thanh tiêu đề
 	Show/Hide ¶	Hiện/Ẩn ¶
 	Show\nComments	Hiện\nnhận xét
 	Shrink Font 1 Point	Giảm cỡ phông chữ 1 pt
@@ -783,7 +778,7 @@
 	Small caps	Chữ hoa nhỏ
 	SmartArt	SmartArt
 	Sort	Sắp xếp
-	Source code: github.com/storytold/wordcraft	Mã nguồn: github.com/storytold/wordcraft
+	Source code: github.com/685ks/wordcraft	Mã nguồn: github.com/685ks/wordcraft
 	Space	Dấu cách
 	Space before/after:	Khoảng cách trước/sau:
 	Spacing	Khoảng cách
@@ -1156,7 +1151,6 @@
 	Insert a new equation (Alt+=)	Chèn phương trình mới (Alt+=)
 	Leave the equation (Esc)	Rời khỏi phương trình (Esc)
 	Preview	Xem thử
-	getartcraft.com/apps/wordcraft	getartcraft.com/apps/wordcraft
 	Draw Ink	Vẽ mực
 	Erase Ink	Xóa mực
 	Hide Ink	Ẩn mực

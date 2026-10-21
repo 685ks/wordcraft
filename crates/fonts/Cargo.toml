@@ -16,3 +16,6 @@ wuff = { workspace = true }
 unicode-bidi = { workspace = true }
 unicode-script = { workspace = true }
 log = { workspace = true }
+
+[build-dependencies]
+craft-fonts-build = { workspace = true }

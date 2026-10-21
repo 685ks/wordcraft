@@ -26,7 +26,7 @@ use skrifa::MetadataProvider;
 use skrifa::instance::Size;
 pub use ui_fallback::{SystemUiFont, is_cjk, system_cjk_ui_font, system_cjk_ui_font_for, ui_needs_system_cjk, ui_uncovered_cjk};
 
-/// A font from the optional craft-fonts build input (https://github.com/storytold/craft-fonts;
+/// A font from the optional craft-fonts build input (https://github.com/685ks/craft-fonts;
 /// empty unless built with `CRAFT_FONTS_DIR`, see `build.rs`).
 pub struct CraftFont {
     pub family: &'static str,

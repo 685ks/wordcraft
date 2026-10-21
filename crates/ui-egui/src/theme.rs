@@ -1,4 +1,8 @@
-//! Design tokens (light and dark), UI fonts and the egui style.
+//! Design tokens, UI fonts and the egui style.
+//!
+//! Two palettes: the house theme (dark, steel-blue accent; the default), filled from the shared
+//! `craft-tokens` crate (Arthavan Projects' design system), and the light theme as the alternate.
+//! Only the interface takes the house theme: pages stay white (document colour, not UI).
 
 use std::sync::Arc;
 
@@ -15,8 +19,9 @@ pub const APP_INK: Color32 = Color32::from_rgb(0x2B, 0x47, 0xB5);
 #[serde(from = "String", into = "String")]
 pub enum Appearance {
     Light,
-    Dark,
+    /// The house theme ([`Tokens::house`]), the default.
     #[default]
+    Dark,
     System,
 }
 
@@ -359,47 +364,60 @@ impl Tokens {
             on_close: Color32::WHITE,
         }
     }
+    /// The dark palette: the house theme.
     pub fn dark() -> Self {
+        Self::house()
+    }
+
+    /// The house theme: the shared design tokens (`craft-tokens`), mapped as the design system's
+    /// ADOPTION guide (section 2) says. Translucent web surfaces are flattened onto the opaque
+    /// panel, since egui can't blur what is behind it. Pages stay white; the canvas round them is
+    /// the neutral `--bg`.
+    pub fn house() -> Self {
+        use craft_tokens::{Rgba, color as c};
+        let card = c::SURFACE_PANEL.over(c::BG_BASE);
+        let on_card = |x: Rgba| Color32::from(x.over(card));
+        let white = |alpha: f32| on_card(Rgba::rgb(255, 255, 255).with_alpha(alpha));
         Tokens {
             dark: true,
-            title_bar: Color32::from_rgb(0x1F, 0x1F, 0x1F),
-            ribbon: Color32::from_rgb(0x29, 0x29, 0x29),
-            tab_strip: Color32::from_rgb(0x1F, 0x1F, 0x1F),
-            canvas: Color32::from_rgb(0x14, 0x14, 0x14),
-            panel: Color32::from_rgb(0x26, 0x26, 0x26),
-            border: Color32::from_rgb(0x3A, 0x3A, 0x3A),
-            border_strong: Color32::from_rgb(0x55, 0x55, 0x55),
-            text: Color32::from_rgb(0xEE, 0xEE, 0xEE),
-            text_dim: Color32::from_rgb(0xC8, 0xC8, 0xC8),
-            text_disabled: Color32::from_rgb(0x6A, 0x6A, 0x6A),
-            icon: Color32::from_rgb(0xDD, 0xDD, 0xDD),
-            hover: Color32::from_rgb(0x3D, 0x3D, 0x3D),
-            pressed: Color32::from_rgb(0x4A, 0x4A, 0x4A),
-            checked: Color32::from_rgb(0x2E, 0x3A, 0x66),
-            accent: Color32::from_rgb(0x7A, 0x93, 0xF0),
-            accent_text: Color32::from_rgb(0x9C, 0xB0, 0xF5),
-            // Dark text on the light dark-theme accent: white on #7a93f0 is only 2.9:1 (#655).
-            on_accent: Color32::from_rgb(0x11, 0x16, 0x2E),
-            input: Color32::from_rgb(0x1E, 0x1E, 0x1E),
-            input_border: Color32::from_rgb(0x7A, 0x7A, 0x7A),
-            group_label: Color32::from_rgb(0xA0, 0xA0, 0xA0),
+            title_bar: c::BG_SHEET.into(),
+            ribbon: card.into(),
+            tab_strip: c::BG_SHEET.into(),
+            canvas: c::BG_BASE.into(),
+            panel: card.into(),
+            border: on_card(c::BORDER_LINE),
+            border_strong: white(0.22),
+            text: c::TEXT_INK.into(),
+            text_dim: c::TEXT_MUTED.into(),
+            text_disabled: white(0.28),
+            icon: c::TEXT_STRONG.into(),
+            hover: on_card(c::SURFACE_FILL_FOCUS),
+            pressed: white(0.09),
+            checked: on_card(c::ACCENT_BASE.with_alpha(0.22)),
+            accent: c::ACCENT_BASE.into(),
+            accent_text: c::ACCENT_BRIGHT.into(),
+            on_accent: c::TEXT_ON_ACCENT.into(),
+            input: on_card(c::SURFACE_FILL_3),
+            input_border: c::TEXT_FAINT.into(),
+            group_label: c::TEXT_FAINT.into(),
             // The text area is lighter than the margins, as in the light theme (#1148).
-            ruler: Color32::from_rgb(0x45, 0x45, 0x45),
-            ruler_margin: Color32::from_rgb(0x2E, 0x2E, 0x2E),
-            ruler_tick: Color32::from_rgb(0xB4, 0xB4, 0xB4),
-            status_bar: Color32::from_rgb(0x1F, 0x1F, 0x1F),
-            selection: Color32::from_rgba_unmultiplied(0x7A, 0x93, 0xF0, 0x55),
-            find_highlight: Color32::from_rgba_unmultiplied(0xC8, 0xA8, 0x00, 0x70),
+            ruler: white(0.09),
+            ruler_margin: c::BG_BASE.into(),
+            ruler_tick: c::TEXT_MUTED.into(),
+            status_bar: c::BG_SHEET.into(),
+            selection: c::ACCENT_BASE.with_alpha(0.35).into(),
+            find_highlight: c::ACCENT_GOLD.with_alpha(0.44).into(),
             page_shadow: Color32::from_rgba_unmultiplied(0, 0, 0, 0x60),
-            handle: Color32::from_rgb(0xF2, 0xF2, 0xF2),
+            handle: c::ACCENT_HIGH.into(),
             handle_shadow: Color32::from_rgba_unmultiplied(0, 0, 0, 0x5A),
-            guide: Color32::from_rgb(0xE0, 0x4C, 0xB0),
+            // Drawn on the white page, so the accent's dark shade.
+            guide: c::ACCENT_LOW.into(),
             crop_handle: Color32::BLACK,
             crop_dim: Color32::from_rgba_unmultiplied(0x30, 0x30, 0x30, 0xE0),
-            balloon: Color32::from_rgb(0x2B, 0x2B, 0x2B),
-            markup_area: Color32::from_rgb(0x1B, 0x1B, 0x1B),
-            markup_edge: Color32::from_rgb(0x3A, 0x3A, 0x3A),
-            resolved_text: Color32::from_rgb(0x5B, 0xC0, 0x8A),
+            balloon: white(0.06),
+            markup_area: c::BG_SHEET.into(),
+            markup_edge: on_card(c::BORDER_LINE),
+            resolved_text: c::STATUS_OK.into(),
             author_colors: [
                 Color32::from_rgb(0x7F, 0xA8, 0xF2),
                 Color32::from_rgb(0xE5, 0x78, 0x6B),
@@ -414,11 +432,11 @@ impl Tokens {
                 Color32::from_rgb(0x8E, 0x44, 0xAD),
                 Color32::from_rgb(0xE0, 0x7B, 0x1F),
             ],
-            menu: Color32::from_rgb(0x2B, 0x2B, 0x2B),
-            blue: Color32::from_rgb(0x6C, 0x9B, 0xEA),
-            red: Color32::from_rgb(0xEE, 0x6A, 0x6A),
-            green: Color32::from_rgb(0x5B, 0xC0, 0x8A),
-            orange: Color32::from_rgb(0xF0, 0xA0, 0x50),
+            menu: card.into(),
+            blue: c::TIER_BLUE.into(),
+            red: c::STATUS_ERROR.into(),
+            green: c::STATUS_OK.into(),
+            orange: c::STATUS_WARN.into(),
             // A little lighter than the light theme's red, so it reads against the dark window.
             close_hover: Color32::from_rgb(0xD6, 0x3C, 0x2C),
             close_pressed: Color32::from_rgb(0xB3, 0x30, 0x23),
@@ -743,8 +761,11 @@ fn visuals(t: &Tokens) -> Visuals {
     v.extreme_bg_color = t.input;
     v.faint_bg_color = t.panel;
     v.window_stroke = Stroke::new(1.0, t.border_strong);
-    v.window_corner_radius = CornerRadius::same(8);
-    v.menu_corner_radius = CornerRadius::same(6);
+    // House radii (craft-tokens) in the dark theme; the light theme keeps its own.
+    let (window_r, menu_r, widget_r) =
+        if t.dark { (craft_tokens::radius::XL as u8, craft_tokens::radius::LG as u8, craft_tokens::radius::SM as u8) } else { (8, 6, 4) };
+    v.window_corner_radius = CornerRadius::same(window_r);
+    v.menu_corner_radius = CornerRadius::same(menu_r);
     v.selection.bg_fill = t.selection;
     v.selection.stroke = Stroke::new(1.0, t.accent);
     v.hyperlink_color = t.accent_text;
@@ -754,16 +775,16 @@ fn visuals(t: &Tokens) -> Visuals {
     v.widgets.inactive.weak_bg_fill = t.input;
     v.widgets.inactive.bg_stroke = Stroke::new(1.0, t.input_border);
     v.widgets.inactive.fg_stroke = Stroke::new(1.0, t.text);
-    v.widgets.inactive.corner_radius = CornerRadius::same(4);
+    v.widgets.inactive.corner_radius = CornerRadius::same(widget_r);
     v.widgets.hovered.bg_fill = t.hover;
     v.widgets.hovered.weak_bg_fill = t.hover;
     v.widgets.hovered.bg_stroke = Stroke::new(1.0, t.border_strong);
     v.widgets.hovered.fg_stroke = Stroke::new(1.0, t.text);
-    v.widgets.hovered.corner_radius = CornerRadius::same(4);
+    v.widgets.hovered.corner_radius = CornerRadius::same(widget_r);
     v.widgets.active.bg_fill = t.pressed;
     v.widgets.active.weak_bg_fill = t.pressed;
     v.widgets.active.fg_stroke = Stroke::new(1.0, t.text);
-    v.widgets.active.corner_radius = CornerRadius::same(4);
+    v.widgets.active.corner_radius = CornerRadius::same(widget_r);
     v.widgets.open.bg_fill = t.pressed;
     v.widgets.open.weak_bg_fill = t.pressed;
     v.popup_shadow = egui::Shadow { offset: [0, 4], blur: 16, spread: 0, color: Color32::from_black_alpha(if t.dark { 120 } else { 40 }) };
@@ -790,6 +811,36 @@ mod tests {
         };
         let (x, y) = (lum(a), lum(b));
         (x.max(y) + 0.05) / (x.min(y) + 0.05)
+    }
+
+    #[test]
+    fn the_house_theme_is_the_default_and_comes_from_craft_tokens() {
+        use egui::Color32;
+        assert_eq!(super::Appearance::default(), super::Appearance::Dark);
+        assert!(super::Appearance::default().is_dark(None), "the house theme even when the OS reports no theme");
+        let t = super::Tokens::house();
+        assert!(t.dark);
+        // Values from the design system (tokens.json), not hand-picked.
+        assert_eq!(t.accent, Color32::from_rgb(0x8f, 0xb8, 0xd8), "steel-blue accent");
+        assert_eq!(t.title_bar, Color32::from_rgb(0x0b, 0x0e, 0x14));
+        assert_eq!(t.canvas, Color32::from_rgb(0x07, 0x09, 0x0d), "neutral --bg round the page");
+        assert_eq!(t.ribbon, Color32::from_rgb(0x0c, 0x0f, 0x15), "--panel flattened onto --bg");
+        assert_eq!(t.text, Color32::from_rgb(0xef, 0xfc, 0xff));
+        assert_eq!(super::Tokens::dark().accent, t.accent, "the dark palette is the house theme");
+        for c in [t.ribbon, t.panel, t.border, t.hover, t.pressed, t.checked, t.input, t.menu, t.balloon] {
+            assert_eq!(c.a(), 255, "house surfaces are opaque: {c:?}");
+        }
+        for bg in [t.title_bar, t.ribbon, t.panel, t.hover, t.pressed, t.checked, t.input, t.menu, t.status_bar] {
+            assert!(contrast(t.text, bg) >= 4.5, "text on {bg:?}");
+            assert!(contrast(t.text_dim, bg) >= 4.5, "dim text on {bg:?}");
+            assert!(contrast(t.accent_text, bg) >= 4.5, "accent text on {bg:?}");
+            assert!(contrast(t.icon, bg) >= 3.0, "icon on {bg:?}");
+        }
+        // Light stays as the alternate.
+        assert!(!super::Tokens::light().dark);
+        let ctx = egui::Context::default();
+        super::apply(&ctx, super::Appearance::default());
+        assert_eq!(ctx.options(|o| o.theme_preference), egui::ThemePreference::Dark);
     }
 
     /// #1885: the ✕ on a window's close box reads on its hover and pressed reds in both themes.
@@ -912,7 +963,7 @@ mod tests {
         assert!(semi.iter().any(|n| n.starts_with("fallback ")), "the caption is painted with semibold");
     }
 
-    /// #656: dialog primary buttons, the Discord pill, the table eraser and the Navigation search
+    /// #656: dialog primary buttons, the table eraser and the Navigation search
     /// highlight take their colours from the theme, not fixed light-theme values.
     #[test]
     fn interface_colours_come_from_the_theme() {
