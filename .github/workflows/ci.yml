@@ -1,7 +1,7 @@
 # The CLAUDE.md quality gate (`cargo xtask ci`: fmt, clippy -D warnings, tests, assets, layers,
 # wasm) on every pull request and every push to main, so a merge burst can't land a red tree that
 # only the next contributor's local run discovers; plus the core crates' tests and a build check
-# of the desktop app on Windows. (printing.yml runs the app and UI tests on Linux and Windows.)
+# of the desktop app on Windows. (printing.yml runs the app and UI tests on Windows.)
 #
 # Every third-party action is pinned by commit SHA.
 name: CI
