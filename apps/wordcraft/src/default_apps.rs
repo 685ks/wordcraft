@@ -1,7 +1,7 @@
 //! File › Options › General › Make WordCraft the default for Word documents (#295).
 //!
 //! The installers register WordCraft for Word, RTF and ODT files without taking over the
-//! defaults (`packaging/windows/wordcraft.wxs`, the `.desktop` file's `MimeType=`, `Info.plist`).
+//! defaults (`packaging/windows/wordcraft.wxs`).
 //! This is the button that makes it the default when the user asks:
 //! - **Windows** doesn't let apps set defaults: it opens Settings › Default apps on WordCraft's
 //!   page (`ms-settings:defaultapps?registeredAppMachine=WordCraft`; Windows 10 ignores the query
@@ -37,7 +37,6 @@ const DESKTOP_ID: &str = "app.freedev.ainz.ks.WordCraft.desktop";
 /// The types the button makes WordCraft the default for on Linux and BSD: Word documents and
 /// templates (also macro-enabled and legacy), RTF and ODT. The same set the Windows installer
 /// lists under WordCraft's Capabilities; Markdown and plain text are only offered under Open With.
-/// Every one is in the `.desktop` file's `MimeType=` (a test checks).
 #[cfg(any(all(unix, not(target_os = "macos")), test))]
 const WORD_MIME_TYPES: &[&str] = &[
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
@@ -150,18 +149,6 @@ mod tests {
             assert!(args.iter().any(|a| a == t), "{t}");
         }
         assert!(!args.iter().any(|a| a == "text/plain" || a == "text/markdown"), "plain text and Markdown are never claimed");
-    }
-
-    /// Every type the button claims is one the desktop entry declares, or desktops ignore it.
-    #[test]
-    fn the_desktop_entry_declares_every_claimed_type() {
-        let entry = include_str!("../../../packaging/linux/app.freedev.ainz.ks.WordCraft.desktop");
-        let declared: Vec<&str> =
-            entry.lines().find_map(|l| l.strip_prefix("MimeType=")).map(|v| v.split(';').filter(|s| !s.is_empty()).collect()).unwrap_or_default();
-        for t in WORD_MIME_TYPES {
-            assert!(declared.contains(t), "{t} missing from MimeType=");
-        }
-        assert!(entry.lines().any(|l| l == "Exec=wordcraft %F"), "files are passed on the command line");
     }
 
     #[cfg(unix)]

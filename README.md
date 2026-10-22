@@ -9,12 +9,12 @@
 <p align="center">
   A fast, open-source word processor with a familiar workflow: the ribbon, styles,
   tables, track changes, references and mail merge. It reads and writes .docx, runs natively on
-  macOS, Windows, Linux and BSD, and in the browser via WebAssembly.
+  Windows, and in the browser via WebAssembly.
 </p>
 
 <p align="center">
   <img alt="Written in Rust" src="https://img.shields.io/badge/written%20in-Rust-2b47b5?style=flat-square&logo=rust&logoColor=white">
-  <img alt="Runs on macOS, Windows, Linux, BSD and the web" src="https://img.shields.io/badge/runs%20on-macOS%20%C2%B7%20Windows%20%C2%B7%20Linux%20%C2%B7%20BSD%20%C2%B7%20Web-3b5bdb?style=flat-square">
+  <img alt="Runs on Windows and the web" src="https://img.shields.io/badge/runs%20on-Windows%20%C2%B7%20Web-3b5bdb?style=flat-square">
   <img alt="License: MIT OR Apache-2.0" src="https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-2b47b5?style=flat-square">
   <img alt="Agent-drivable over MCP" src="https://img.shields.io/badge/agents-MCP%20%C2%B7%20CLI-3b5bdb?style=flat-square">
 </p>
@@ -231,64 +231,6 @@ software renderer, which draws every frame on the processor. WordCraft normally 
 without setting anything. If OpenGL has no usable adapter, it can use DirectX 12's WARP software
 adapter. The log file records the choice (lines starting with
 `graphics:`). `WGPU_BACKEND` still overrides it, e.g. `$env:WGPU_BACKEND = "gl"` or `"dx12"`.
-
-### macOS
-
-| Build | File | Notes |
-|---|---|---|
-| App, universal (Apple silicon + Intel) | `wordcraft-<ver>-macos-universal.dmg` | Signed and notarized |
-| Command-line tool, universal | `wordcraft-cli-<ver>-macos-universal.zip` | Signed and notarized |
-
-### Linux
-
-| Format | x86_64 | aarch64 (ARM64) | Notes |
-|---|---|---|---|
-| AppImage | `wordcraft-<ver>-linux-x86_64.AppImage` | `wordcraft-<ver>-linux-aarch64.AppImage` | Runs anywhere; updates itself with [AppImageUpdate](https://github.com/AppImageCommunity/AppImageUpdate) (`.zsync` files) |
-| Flatpak | `wordcraft-<ver>-linux-x86_64.flatpak` | `wordcraft-<ver>-linux-aarch64.flatpak` | Sandboxed; `flatpak install --user <file>` |
-| Debian/Ubuntu | `wordcraft-<ver>-linux-x86_64.deb` | `wordcraft-<ver>-linux-aarch64.deb` | |
-| Fedora/RHEL/openSUSE | `wordcraft-<ver>-linux-x86_64.rpm` | `wordcraft-<ver>-linux-aarch64.rpm` | |
-| Tarball | `wordcraft-<ver>-linux-x86_64.tar.gz` | `wordcraft-<ver>-linux-aarch64.tar.gz` | Unpack anywhere |
-
-RISC-V (riscv64): `wordcraft-<ver>-linux-riscv64.tar.gz`, a tarball cross-compiled for glibc 2.39+
-(Ubuntu 24.04, Debian 13 and newer).
-
-**Wayland:** on a Wayland desktop the app runs through XWayland when it is available, because
-winit (the windowing library) supports dragging files into the window only on X11. To use the
-native Wayland backend instead (for example for sharper text with fractional scaling, at the cost
-of file drag-and-drop), start it with `WORDCRAFT_WAYLAND=1`:
-
-```sh
-WORDCRAFT_WAYLAND=1 wordcraft
-```
-
-**Arch Linux (AUR).** Community members maintain three AUR packages; the project doesn't publish
-to the AUR itself. Install one of them:
-| Package | What it installs | Choose it when |
-|---|---|---|
-| [`wordcraft-bin`](https://aur.archlinux.org/packages/wordcraft-bin) | The release tarball above, prebuilt (x86_64, aarch64) | You want the latest release without compiling (quickest) |
-| [`wordcraft`](https://aur.archlinux.org/packages/wordcraft) | The latest release, built from source with `cargo` | You prefer to build releases yourself |
-| [`wordcraft-git`](https://aur.archlinux.org/packages/wordcraft-git) | The current `main` branch, built from source | You want unreleased changes and accept an occasional broken build |
-For example `yay -S wordcraft-bin` or `paru -S wordcraft-bin`.
-
-#### Community packages
-
-These packages are maintained by community members, not by the WordCraft team.
-
-On Gentoo, the [::snakebyte overlay](https://github.com/switch87/snakebyte-overlay) packages the
-Linux release as `app-office/wordcraft-bin` (prebuilt) and `app-office/wordcraft` (built from source):
-
-```sh
-eselect repository add snakebyte git https://github.com/switch87/snakebyte-overlay.git
-emaint sync -r snakebyte
-echo 'app-office/wordcraft-bin ~amd64' >> /etc/portage/package.accept_keywords/wordcraft
-emerge --ask app-office/wordcraft-bin
-```
-
-### FreeBSD
-
-| Build | File |
-|---|---|
-| x86_64 | `wordcraft-<ver>-freebsd-x86_64.tar.gz` |
 
 ### Web (WebAssembly)
 
