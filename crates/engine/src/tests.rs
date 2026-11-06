@@ -8491,3 +8491,38 @@ fn rtf_list_round_trip_keeps_text() {
         assert_eq!(d.plain_text(StoryRef::Body), "first\nsecond", "{cmd}");
     }
 }
+
+#[test]
+fn typing_over_the_start_of_a_commented_passage_saves_a_file_word_opens() {
+    // Typing over a selection that holds a comment's start but not its end used to save a
+    // `w:commentRangeEnd` with no `w:commentRangeStart`, a file Word reports as damaged.
+    let mut s = s();
+    run(&mut s, "text.insert", json!({"text": "one two three"}));
+    run(&mut s, "select.text", json!({"text": "two"}));
+    run(&mut s, "review.newComment", json!({"text": "Check this."}));
+    // Back in the body, select "one tw" (the start marker sits before "two") and type over it.
+    let tw = 4 + wordcraft_doc::para::OBJ.len_utf8() + 2;
+    run(&mut s, "select.range", json!({"anchor": {"story": "body", "path": [0], "off": 0}, "focus": {"story": "body", "path": [0], "off": tw}}));
+    run(&mut s, "text.insert", json!({"text": "1 "}));
+    assert_eq!(text(&s), "1 o three");
+    assert!(s.doc.has_unbalanced_comment_ranges(), "the edit leaves the end alone");
+    let bytes = crate::io::save_bytes("c.docx", &s.doc).unwrap();
+    let xml = {
+        use std::io::Read;
+        let mut z = zip::ZipArchive::new(std::io::Cursor::new(&bytes)).unwrap();
+        let mut x = String::new();
+        z.by_name("word/document.xml").unwrap().read_to_string(&mut x).unwrap();
+        x
+    };
+    let at = |tag: &str| xml.find(tag).unwrap_or_else(|| panic!("no {tag} in {xml}"));
+    for tag in ["<w:commentRangeStart ", "<w:commentRangeEnd ", "<w:commentReference "] {
+        assert_eq!(xml.matches(tag).count(), 1, "{tag} in {xml}");
+    }
+    assert!(at("<w:commentRangeStart ") < at("<w:commentRangeEnd "));
+    assert!(at("<w:commentRangeEnd ") < at("<w:commentReference "));
+    // The comment survives the round trip; the editor's own document is left as it was.
+    let back = crate::io::open_bytes("c.docx", &bytes).unwrap();
+    assert_eq!(back.comments.len(), 1);
+    assert!(!back.has_unbalanced_comment_ranges());
+    assert!(s.doc.has_unbalanced_comment_ranges());
+}
