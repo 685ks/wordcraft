@@ -34,9 +34,11 @@ pub fn specs() -> Vec<CommandSpec> {
         })
         .params(r#"{"level": 0 (do not show) | 1-9}"#),
         CommandSpec::new("references.footnote", "Insert Footnote", "References › Footnotes", |s, v| note(s, v, NoteKind::Footnote))
+            .when(no_notes_here)
             .key("Mod+Alt+F")
             .params(r#"{"text"?: string, "mark"?: string (a custom mark instead of the number)}"#),
         CommandSpec::new("references.endnote", "Insert Endnote", "References › Footnotes", |s, v| note(s, v, NoteKind::Endnote))
+            .when(no_notes_here)
             // macOS takes ⌘⌥D to show and hide the Dock; Word for Mac uses ⌘⌥E.
             .key(super::mac_or("Mod+Alt+E", "Mod+Alt+D"))
             .params(r#"{"text"?: string, "mark"?: string (a custom mark instead of the number)}"#),
@@ -656,6 +658,11 @@ fn entry_tabs(s: &Session, props: &wordcraft_doc::ParaProps, text: &str, right: 
     }
     tabs.push(right);
     tabs
+}
+
+/// As in Word: no footnotes or endnotes in a text box (Word won't open a file with one there).
+fn no_notes_here(s: &Session) -> Option<&'static str> {
+    super::in_text_box(s).then_some("footnotes and endnotes can't go in a text box")
 }
 
 fn note(s: &mut Session, v: &Value, kind: NoteKind) -> CmdResult {

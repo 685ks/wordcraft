@@ -8526,3 +8526,78 @@ fn typing_over_the_start_of_a_commented_passage_saves_a_file_word_opens() {
     assert!(!back.has_unbalanced_comment_ranges());
     assert!(s.doc.has_unbalanced_comment_ranges());
 }
+
+/// `word/document.xml` of a saved `.docx`.
+fn saved_document_xml(doc: &wordcraft_doc::Document) -> String {
+    use std::io::Read;
+    let bytes = crate::io::save_bytes("t.docx", doc).unwrap();
+    let mut z = zip::ZipArchive::new(std::io::Cursor::new(bytes)).unwrap();
+    let mut x = String::new();
+    z.by_name("word/document.xml").unwrap().read_to_string(&mut x).unwrap();
+    x
+}
+
+#[test]
+fn text_boxes_refuse_notes_breaks_and_floating_objects_as_word_does() {
+    let mut s = s();
+    run(&mut s, "text.insert", json!({"text": "Body"}));
+    run(&mut s, "insert.textBox", json!({"text": "In the box"}));
+    for id in ["references.footnote", "references.endnote", "text.pageBreak", "text.columnBreak"] {
+        let e = s.run(id, &json!({})).unwrap_err().to_string();
+        assert!(e.contains("text box"), "{id}: {e}");
+    }
+    let png = crate::cmd::insert::base64_encode(&tiny_png());
+    run(&mut s, "insert.picture", json!({"data": png}));
+    let e = s.run("arrange.wrap", &json!({"wrap": "square"})).unwrap_err().to_string();
+    assert!(e.contains("in line with text"), "{e}");
+    run(&mut s, "arrange.wrap", json!({"wrap": "inline"}));
+    // In the main text they all still work.
+    let mut b = self::s();
+    run(&mut b, "text.insert", json!({"text": "Body"}));
+    run(&mut b, "references.footnote", json!({"text": "note"}));
+    run(&mut b, "text.pageBreak", json!({}));
+}
+
+#[test]
+fn a_text_box_is_saved_with_only_what_word_allows_in_one() {
+    // Files where an older WordCraft put a footnote, a page break or a floating picture in a
+    // text box: Word reports such files as damaged.
+    use wordcraft_doc::para::{NoteKind, PAGE_BREAK, Wrap};
+    use wordcraft_doc::{CharProps, InlineObject, PartKind, Path};
+    let mut s = s();
+    run(&mut s, "text.insert", json!({"text": "Body"}));
+    let id = run(&mut s, "insert.textBox", json!({"text": "Box"}))["story"].as_u64().unwrap() as u32;
+    let png = crate::cmd::insert::base64_encode(&tiny_png());
+    run(&mut s, "insert.picture", json!({"data": png}));
+    let note = s
+        .doc
+        .try_add_part(PartKind::Footnote, vec![wordcraft_doc::para_block(wordcraft_doc::Paragraph::with_text("n", CharProps::default()))])
+        .unwrap();
+    let p = s.doc.para_mut(StoryRef::Part(id), &Path::top(0)).unwrap();
+    for off in p.object_offsets() {
+        if let Some(f) = p.object_at_mut(off).and_then(|o| o.float_mut()) {
+            f.wrap = Wrap::Square;
+        }
+    }
+    p.insert_text(1, &PAGE_BREAK.to_string(), &CharProps::default()).unwrap();
+    p.insert_object(0, InlineObject::NoteRef { kind: NoteKind::Footnote, id: note, custom: String::new() }, &CharProps::default()).unwrap();
+    assert!(p.text.contains(PAGE_BREAK));
+
+    let xml = saved_document_xml(&s.doc);
+    let start = xml.find("<w:txbxContent>").unwrap();
+    let end = xml.find("</w:txbxContent>").unwrap();
+    let inside = &xml[start..end];
+    assert!(inside.contains("<pic:pic"), "the picture is kept: {inside}");
+    assert!(inside.contains("<wp:inline"), "{inside}");
+    assert!(!inside.contains("<wp:anchor"), "{inside}");
+    assert!(!inside.contains("w:footnoteReference"), "{inside}");
+    assert!(!inside.contains("w:type=\"page\""), "{inside}");
+    assert!(inside.contains("<w:br/>"), "the break stays a line break: {inside}");
+    // Outside text boxes nothing changes.
+    let mut b = self::s();
+    run(&mut b, "text.insert", json!({"text": "Body"}));
+    run(&mut b, "text.pageBreak", json!({}));
+    run(&mut b, "references.footnote", json!({"text": "note"}));
+    let body = saved_document_xml(&b.doc);
+    assert!(body.contains("w:footnoteReference") && body.contains("w:type=\"page\""), "{body}");
+}
