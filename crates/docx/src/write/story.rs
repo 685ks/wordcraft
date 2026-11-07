@@ -367,6 +367,9 @@ impl Writer<'_> {
                             Piece::Text(t) if !t.is_empty() => w.leaf(if del { "w:delText" } else { "w:t" }, &[("xml:space", "preserve")], t),
                             Piece::Tab => w.empty("w:tab", &[]),
                             Piece::Br(None) => w.empty("w:br", &[]),
+                            // No page or column breaks in a text box (Word has none there):
+                            // a line break keeps the text apart.
+                            Piece::Br(Some(_)) if self.boxes.inside() => w.empty("w:br", &[]),
                             Piece::Br(Some(t)) => w.empty("w:br", &[("w:type", t)]),
                             Piece::NbHyphen => w.empty("w:noBreakHyphen", &[]),
                             Piece::SoftHyphen => w.empty("w:softHyphen", &[]),
@@ -467,6 +470,19 @@ impl Writer<'_> {
     }
 
     fn object(&mut self, w: &mut W, o: &InlineObject, props: &CharProps, rels: &mut PartRels, depth: usize) {
+        // Word keeps only objects in line with text inside a text box (it greys out the other
+        // wrapping choices there) and reports a file with a floating one as damaged: a floating
+        // object inside a box is written in line, where Word would put it.
+        if self.boxes.inside()
+            && let Some((_, _, f)) = o.frame()
+            && f.wrap != Wrap::Inline
+        {
+            let mut inline = o.clone();
+            if let Some(f) = inline.float_mut() {
+                f.wrap = Wrap::Inline;
+            }
+            return self.object(w, &inline, props, rels, depth);
+        }
         match o {
             // Written by `para_content` (inline) or `blocks` (around paragraphs).
             InlineObject::ControlStart { .. } | InlineObject::ControlEnd => {}
@@ -529,6 +545,9 @@ impl Writer<'_> {
                 field_run(w, props, &|w| w.empty("w:fldChar", &[("w:fldCharType", "end")]));
                 self.rev_close(w, props);
             }
+            // Word has no footnotes or endnotes in text boxes and won't open a file with a
+            // reference there: such a note (made by an older WordCraft) is left out.
+            InlineObject::NoteRef { .. } if self.boxes.inside() => {}
             InlineObject::NoteRef { kind, id, custom } => {
                 let foot = *kind == NoteKind::Footnote;
                 if self.current_note == Some((foot, *id)) {

@@ -214,6 +214,11 @@ pub fn remove_empty_para(s: &mut Session, story: StoryRef, path: &wordcraft_doc:
 }
 
 /// Tracked deletion: own insertions are removed, other text is marked deleted.
+/// Whether the caret is in a text box's text.
+pub(crate) fn in_text_box(s: &Session) -> bool {
+    matches!(s.sel.focus.story, StoryRef::Part(id) if s.doc.parts.get(&id).is_some_and(|p| p.kind == wordcraft_doc::PartKind::TextBox))
+}
+
 pub(crate) fn track_delete(s: &mut Session, a: &Pos, b: &Pos) -> Result<Pos, CmdError> {
     let rid = new_revision(s, RevisionKind::Delete);
     track_delete_as(s, a, b, rid)
