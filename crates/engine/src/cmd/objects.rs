@@ -963,6 +963,17 @@ fn edit_float(s: &mut Session, pos: &Pos, f: impl Fn(&mut Float)) -> Result<Inli
 }
 
 fn with_float(s: &mut Session, f: impl Fn(&mut Float)) -> CmdResult {
+    // As in Word, an object in a text box stays in line with text: Word won't open a file with
+    // a floating one there.
+    if super::in_text_box(s)
+        && let Some((_, mut o)) = selected(s)
+        && let Some(float) = o.float_mut()
+    {
+        f(float);
+        if float.wrap != Wrap::Inline {
+            return Err(CmdError::Failed("objects in a text box stay in line with text".into()));
+        }
+    }
     with_obj(s, |o| {
         if let Some(float) = o.float_mut() {
             let was_inline = float.wrap == Wrap::Inline;

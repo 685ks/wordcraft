@@ -138,10 +138,12 @@ pub fn write_as(doc: &Document, flavor: Flavor) -> Result<Vec<u8>, DocxError> {
 /// without the leading `/`, bytes).
 pub(crate) fn write_parts(doc: &Document, flavor: Flavor) -> Result<Vec<(String, Vec<u8>)>, DocxError> {
     // A range field must be whole in the file: drop markers that lost their partner in editing.
+    // Comment ranges too: Word won't open a file where a comment's start and end don't pair up.
     let balanced;
-    let doc = if doc.has_unbalanced_field_ranges() {
+    let doc = if doc.has_unbalanced_field_ranges() || doc.has_unbalanced_comment_ranges() {
         let mut d = doc.clone();
         d.balance_field_ranges();
+        d.balance_comment_ranges();
         balanced = d;
         &balanced
     } else {

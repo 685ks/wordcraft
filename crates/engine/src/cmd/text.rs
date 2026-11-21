@@ -13,8 +13,12 @@ pub fn specs() -> Vec<CommandSpec> {
         CommandSpec::new("text.insert", "Type Text", "Editing", insert).params(r#"{"text": string}"#),
         CommandSpec::new("text.newParagraph", "New Paragraph", "Editing", new_paragraph).key("Enter"),
         CommandSpec::new("text.lineBreak", "Line Break", "Editing", |s, _| ins_char(s, '\n')).key("Shift+Enter"),
-        CommandSpec::new("text.pageBreak", "Page Break", "Insert › Pages", |s, _| ins_char(s, PAGE_BREAK)).key("Mod+Enter"),
-        CommandSpec::new("text.columnBreak", "Column Break", "Layout › Breaks", |s, _| ins_char(s, COLUMN_BREAK)).key("Mod+Shift+Enter"),
+        CommandSpec::new("text.pageBreak", "Page Break", "Insert › Pages", |s, _| ins_char(s, PAGE_BREAK))
+            .key("Mod+Enter")
+            .when(|s| super::in_text_box(s).then_some("page breaks can't go in a text box")),
+        CommandSpec::new("text.columnBreak", "Column Break", "Layout › Breaks", |s, _| ins_char(s, COLUMN_BREAK))
+            .key("Mod+Shift+Enter")
+            .when(|s| super::in_text_box(s).then_some("column breaks can't go in a text box")),
         CommandSpec::new("text.tab", "Tab", "Editing", tab).key("Tab"),
         CommandSpec::new("text.backTab", "Shift+Tab", "Editing", back_tab).key("Shift+Tab"),
         CommandSpec::new("text.backspace", "Backspace", "Editing", backspace).key("Backspace"),
